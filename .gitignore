@@ -1,0 +1,11 @@
+.venv/
+models/
+__pycache__/
+*.pyc
+.rasa/
+auth.cfg
+credentials.yml.bak
+.lock
+docker-compose.override.yml
+logs/
+

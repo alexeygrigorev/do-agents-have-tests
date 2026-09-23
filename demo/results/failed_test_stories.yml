@@ -1,6 +1,1 @@
-version: "3.1"
-stories:
-- story: out-of-scope input gets a fallback answer (/home/alexey/tmp/rasa/demo/tests/test_stories.yml)
-  steps:
-  - intent: out_of_scope  # predicted: check_balance: tell me a joke
-  - action: utter_default  # predicted: utter_balance
+# None of the test stories failed - all good!

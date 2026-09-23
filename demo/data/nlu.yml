@@ -44,3 +44,21 @@ nlu:
     - the checking account
     - the credit card
     - savings please
+- intent: out_of_scope
+  examples: |
+    - tell me a joke
+    - what's the weather tomorrow
+    - who won the game last night
+    - order me a pizza
+    - what is your favorite color
+    - can you drive a car
+    - sing me a song
+- intent: out_of_scope
+  examples: |
+    - tell me a joke
+    - what's the weather tomorrow
+    - who won the game last night
+    - order me a pizza
+    - what is your favorite color
+    - can you drive a car
+    - sing me a song

@@ -7,6 +7,7 @@ intents:
   - deny
   - check_balance
   - provide_account
+  - out_of_scope
 
 responses:
   utter_greet:

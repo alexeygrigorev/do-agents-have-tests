@@ -10,3 +10,13 @@ rules:
   steps:
   - intent: goodbye
   - action: utter_goodbye
+
+- rule: out-of-scope questions get a fallback answer
+  steps:
+  - intent: out_of_scope
+  - action: utter_default
+
+- rule: low-confidence messages get a fallback answer
+  steps:
+  - intent: nlu_fallback
+  - action: utter_default

@@ -1,0 +1,26 @@
+stories:
+- story: balance happy path
+  steps:
+  - user: |
+      hi
+    intent: greet
+  - action: utter_greet
+  - user: |
+      what's my balance
+    intent: check_balance
+  - action: utter_ask_account
+  - user: |
+      savings
+    intent: provide_account
+  - action: utter_balance
+  - user: |
+      bye
+    intent: goodbye
+  - action: utter_goodbye
+
+- story: out-of-scope input gets a fallback answer
+  steps:
+  - user: |
+      tell me a joke
+    intent: out_of_scope
+  - action: utter_default

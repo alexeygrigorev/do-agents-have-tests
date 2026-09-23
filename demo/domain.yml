@@ -8,16 +8,6 @@ intents:
   - check_balance
   - provide_account
 
-slots:
-  account_type:
-    type: text
-    influence_conversation: false
-    mappings:
-      - type: from_text
-        conditions:
-          - active_loop: null
-            requested_slot: null
-
 responses:
   utter_greet:
     - text: "Hi! I'm Ada, the demo bank assistant. I can check your account balance."
@@ -26,6 +16,6 @@ responses:
   utter_ask_account:
     - text: "Which account would you like to check — savings, checking, or credit?"
   utter_balance:
-    - text: "Your {account_type} account balance is €1,234.56."
+    - text: "Your account balance is €1,234.56."
   utter_default:
     - text: "Sorry, I didn't understand that. I can check your account balance — just ask."

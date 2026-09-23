@@ -1,0 +1,9 @@
+version: "3.1"
+
+stories:
+- story: check balance flow
+  steps:
+  - intent: check_balance
+  - action: utter_ask_account
+  - intent: provide_account
+  - action: utter_balance

@@ -33,8 +33,11 @@ a Rasa Pro license, and the ecosystem is much smaller than LangChain's.
 
 1. **The testing story is real, not marketing.** `rasa test nlu` runs k-fold cross-validation
    over your training data; conversation tests are YAML files in `tests/` that replay whole
-   dialogues (including end-to-end mode that skips NLU); reports come out as JSON/Markdown;
-   failed tests exit non-zero, so `rasa test` drops straight into CI. Verified in `demo/`.
+   dialogues (annotated with intents, per the docs); reports come out as JSON/Markdown and
+   failed stories are written to `failed_test_stories.yml`. Verified hands-on in `demo/` —
+   including a real failure caught and fixed in a reviewable diff. Two caveats found by using
+   it: the CLI exits **0 even when tests fail** (parse `story_report.json` in CI yourself),
+   and the modern `rasa test e2e` framework (fixtures, response assertions) is **Pro only**.
 2. **The agent is an artifact built from a repo.** NLU data, stories, config, and tests are
    plain files → reviewable PRs, diffs on behavior change, reproducible builds. This is the
    brief's "inspect, reproduce, and own what you ship" — and it holds up.
@@ -56,7 +59,9 @@ a Rasa Pro license, and the ecosystem is much smaller than LangChain's.
    far slower to first working bot than Dialogflow/Voiceflow, and the docs have rough edges
    (outdated pages exist).
 3. **Slow OSS cadence, heavy stack.** OSS pins Python ≤3.11 and drags in TensorFlow; the
-   install is hundreds of MB. Feels like 2019 engineering in an LLM world.
+   install is hundreds of MB. Feels like 2019 engineering in an LLM world. Hands-on:
+   the dask dependency isn't even pinned for Python 3.11, so a fresh install crashes on
+   `rasa train` until you add dask yourself (and the newest dask breaks graph execution).
 4. **Smaller ecosystem.** Fewer examples, integrations, Stack Overflow answers, and hires
    compared to LangChain/LangGraph. The conversational-AI niche is deep but narrow.
 5. **You bring your own CI/CD.** It's CI-*friendly* (files + exit codes) but there's no

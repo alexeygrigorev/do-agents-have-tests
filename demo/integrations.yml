@@ -12,5 +12,30 @@ model_groups:
 channels:
   rest:
     enabled: true
+  # The mic button in `rasa inspect` (inspector) and the raw browser voice
+  # channel (browser_audio) share the same ElevenLabs engines, implemented
+  # in engines/elevenlabs.py — ElevenLabs is not a built-in Rasa speech
+  # engine. ELEVENLABS_API_KEY lives in the repo-root .env. To switch to a
+  # built-in engine instead, set name: deepgram (ASR and TTS) and add
+  # DEEPGRAM_API_KEY to .env.
   inspector:
     enabled: true
+    server_url: localhost
+    asr:
+      name: engines.elevenlabs.ElevenLabsASR
+    tts:
+      name: engines.elevenlabs.ElevenLabsTTS
+      voice_id: 21m00Tcm4TlvDq8ikWAM
+      model_id: eleven_multilingual_v2
+      chunk_length_schedule: [50, 80, 120, 200]
+  browser_audio:
+    enabled: true
+    server_url: localhost
+    sample_rate: 24000
+    asr:
+      name: engines.elevenlabs.ElevenLabsASR
+    tts:
+      name: engines.elevenlabs.ElevenLabsTTS
+      voice_id: 21m00Tcm4TlvDq8ikWAM
+      model_id: eleven_multilingual_v2
+      chunk_length_schedule: [50, 80, 120, 200]

@@ -18,6 +18,10 @@ scenario:
       - slot_was_set:
           - name: check_balance.selected_account_id
             value: acc_savings
-      - action_executed: get_balance
+      # get_balance is the only writer of this label. Mantle records
+      # tool_executed, which action_executed does not see.
+      - slot_was_set:
+          - name: check_balance.selected_account_label
+            value: Rainy Day Savings
       - bot_uttered:
           text_matches: "1,234\\.56"

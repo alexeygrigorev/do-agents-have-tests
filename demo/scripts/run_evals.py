@@ -1,9 +1,9 @@
 """Run every scenario under eval/scenarios against a local Rasa server.
 
-Usage (from demo/, after `rasa train` and `rasa run`):
+Usage (from demo/, after `uv run rasa train` and `uv run rasa run --enable-api`):
 
-    ../.venv-pro/bin/python scripts/run_evals.py
-    ../.venv-pro/bin/python scripts/run_evals.py eval/scenarios/joke_starts_nothing.yml
+    uv run python scripts/run_evals.py
+    uv run python scripts/run_evals.py eval/scenarios/joke_starts_nothing.yml
 """
 
 from __future__ import annotations

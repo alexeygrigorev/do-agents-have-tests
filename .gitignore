@@ -2,6 +2,7 @@
 .venv-pro/
 .env
 models/
+demo/eval/results/
 __pycache__/
 *.pyc
 .rasa/

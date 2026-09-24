@@ -5,7 +5,7 @@ collaboration brief (PDF), rasa.com, rasa.com/docs, and hands-on use of Rasa.
 
 The runnable demo in `demo/` is a **Rasa Pro 3.20 Mantle agent** (LLM skill +
 tools) with simulation scenarios under `eval/scenarios/`. It needs Python
-3.11–3.14 (this machine uses 3.12) and `RASA_LICENSE`. The notes below about
+3.14, via uv in `demo/`, and `RASA_LICENSE`. The notes below about
 Open Source 3.6.21 are the earlier intent/story experiment, kept as findings,
 not a description of the current demo.
 

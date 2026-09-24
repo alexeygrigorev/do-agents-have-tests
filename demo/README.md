@@ -41,6 +41,28 @@ assertions watch those slots:
 | `important_skills.yml` | the search runs, and the skills listed come from the guide, with no invented numbers |
 | `off_topic_joke.yml` | "tell me a joke" does not trigger a search — no `last_query` slot is ever written |
 
+## Voice
+
+Rex is text-only today, but the voice path is one API key away. Mantle does
+not ship its own speech models: a voice channel streams audio into Rasa, and
+speech integrations provide the ears and the mouth.
+
+- Recognition (ASR): **Deepgram**, **Azure**
+- Voices (TTS): **Azure**, **Cartesia**, **Deepgram** (incl. Flux), **Rime**
+- **ElevenLabs is not on the list.** The engine interface is open: subclass
+  `ASREngine` / `TTSEngine` from `rasa.core.channels.voice_stream.*` and
+  reference your module in `credentials.yml` (`name: my_engines.MyEngine`;
+  `rasa tools init` scaffolds a component). Bring-your-own is a supported
+  path, not a hack.
+
+`credentials.yml` ships a commented `browser_audio` block. Set
+`DEEPGRAM_API_KEY` in the repo-root `.env`, uncomment, restart, and the mic
+button in `rasa inspect` turns the browser into a phone call — barge-in
+included. Telephony channels (Twilio Media Streams, AudioCodes, Genesys
+Cloud, Jambonz, SignalWire, Vonage) reuse the same speech config. Voice
+needs a license with the `rasa:voice` scope; the Developer Edition key in
+this repo's `.env` carries it.
+
 ## Run
 
 Dependencies are `rasa-pro` 3.20.0 and `minsearch`, locked in `uv.lock`.

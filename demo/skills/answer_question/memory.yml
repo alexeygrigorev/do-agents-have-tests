@@ -1,0 +1,6 @@
+schema:
+  public:
+    last_query:
+      type: text
+    last_hit_count:
+      type: text

@@ -1,0 +1,23 @@
+scenario:
+  name: A hiring question reaches the job postings
+
+  simulation_context: >
+    You are an AI engineer looking for a new role. Open by asking which
+    companies are hiring AI engineers right now. After the answer, ask one
+    short follow-up about one of the companies the agent named, then say
+    thanks and end the conversation. Do not ask about interviews or skills.
+
+  goals:
+    criteria:
+      - The agent names at least two real companies that are hiring for AI
+        engineering roles, taken from the search results
+      - The agent does not invent companies or ask the user unnecessary
+        clarifying questions, because the request is clear
+    assertions:
+      - flow_started: answer_question
+      # search_field_guide is the only writer of this slot. Mantle records
+      # tool_executed, which assertions cannot see directly.
+      - slot_was_set:
+          - name: answer_question.last_query
+      - slot_was_set:
+          - name: answer_question.last_hit_count

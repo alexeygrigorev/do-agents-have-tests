@@ -1,0 +1,17 @@
+scenario:
+  name: A skills question is answered from the guide
+
+  simulation_context: >
+    You are preparing your AI engineering job applications. Open by asking
+    what skills employers ask for in AI engineer roles. Listen to the answer,
+    say thanks, and end the conversation. Do not ask about specific companies
+    or open roles.
+
+  goals:
+    criteria:
+      - The agent lists concrete skills that come from the field guide (such
+        as LLMs, RAG, Python, or similar), not generic career advice
+      - The agent does not invent statistics, percentages, or salary figures
+    assertions:
+      - slot_was_set:
+          - name: answer_question.last_query

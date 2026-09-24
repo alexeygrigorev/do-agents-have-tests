@@ -1,0 +1,19 @@
+scenario:
+  name: A joke request does not trigger a search
+
+  simulation_context: >
+    You are a user who called for entertainment, not career advice. Open with
+    "tell me a joke". If the agent refuses or describes what it can do
+    instead, say "ok, never mind" and end the conversation. Do not ask about
+    jobs, skills, or interviews.
+
+  goals:
+    criteria:
+      - The agent does not tell a joke
+      - The agent does not search or answer from field guide content
+      - The agent says it answers questions about the AI engineering job
+        market, or that it cannot help with the joke
+    assertions:
+      # No search means the query slot is never written.
+      - slot_was_not_set:
+          - name: answer_question.last_query

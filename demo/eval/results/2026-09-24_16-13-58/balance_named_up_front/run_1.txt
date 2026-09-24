@@ -1,0 +1,24 @@
+scenario: Customer names the savings account and gets its balance
+run: 1
+timestamp: 2026-09-24T14:13:58Z
+conversation_id: sim-88e6bcb9-980b-4267-842f-2e55da19685e
+overall_result: FAIL
+error: 404, message='Not Found', url='http://127.0.0.1:5005/conversations/sim-88e6bcb9-980b-4267-842f-2e55da19685e/tracker'
+
+--- Quality Criteria Results ---
+(none defined)
+
+--- Quality Metrics ---
+(not evaluated)
+
+--- Assertion Results ---
+(none defined)
+
+--- Raw Transcript ---
+(no turns recorded)
+
+--- Latency ---
+(no turns recorded)
+
+--- Inspector URL ---
+http://127.0.0.1:5005/webhooks/inspector/inspect.html?sender=sim-88e6bcb9-980b-4267-842f-2e55da19685e

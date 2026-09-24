@@ -8,7 +8,13 @@ That's the real problem with AI agents right now. You create a proof of concept 
 
 To solve this problem, we treat the agent as the rest of the production code: we add tests, evals and versioning. 
 
-With Rasa, it's very simple: 
+With Rasa, it's very simple: evals are YAML files. For each case you describe
+
+- the scenario
+- the evaluation criteria
+- deterministic checks
+
+And run it with a simple command. 
 
 Here in this demo I show how I do it. 
 
@@ -16,3 +22,5 @@ Do your agents have tests?
 
 
 This post was created in collaboration with Rasa. Thank you for supporting our community!
+
+![alt text](image.png)

@@ -1,0 +1,15 @@
+{
+  "scenario_slug": "balance_named_up_front",
+  "run_index": 1,
+  "timestamp": "2026-09-24T14:13:58Z",
+  "conversation_id": "sim-88e6bcb9-980b-4267-842f-2e55da19685e",
+  "latency": {
+    "per_turn": [],
+    "avg_ttft_ms": null,
+    "avg_turn_latency_ms": null,
+    "avg_gap_ms": null
+  },
+  "task_completion": null,
+  "eval_passed": false,
+  "criteria": []
+}

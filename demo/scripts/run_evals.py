@@ -48,8 +48,11 @@ async def main(paths: list[Path]) -> int:
             eval_llm_config=conftest.evaluation.llm,
         )
         entries.append(entry)
-        print(f"  -> {entry}", flush=True)
-        if getattr(entry, "runs_passed", 1) < getattr(entry, "run_count", 1):
+        print(
+            f"  -> {entry.runs_passed}/{entry.runs_total} {entry.scenario_name}",
+            flush=True,
+        )
+        if entry.runs_passed < entry.runs_total:
             failed = True
     write_experiment_summary(PROJECT, stamp, entries)
     print(f"results: {PROJECT / 'eval' / 'results' / stamp}")

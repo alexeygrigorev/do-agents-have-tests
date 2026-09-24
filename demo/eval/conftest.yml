@@ -1,0 +1,12 @@
+# Simulator plays the customer. The judge scores criteria.
+# Assertions in the scenarios are deterministic and do not use these models.
+simulation:
+  llm:
+    provider: openai
+    model: gpt-4.1
+    timeout: 60
+evaluation:
+  llm:
+    provider: openai
+    model: gpt-4.1
+    timeout: 60

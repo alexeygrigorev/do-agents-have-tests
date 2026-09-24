@@ -1,8 +1,13 @@
 # Research Notes — Rasa brief vs. reality
 
 Background research done before writing the post (Sept 2026). Sources: Rasa's
-collaboration brief (PDF), rasa.com, rasa.com/docs, and hands-on use of Rasa
-OSS 3.6.21 (see `demo/`).
+collaboration brief (PDF), rasa.com, rasa.com/docs, and hands-on use of Rasa.
+
+The runnable demo in `demo/` is a **Rasa Pro 3.20 Mantle agent** (LLM skill +
+tools) with simulation scenarios under `eval/scenarios/`. It needs Python
+3.11–3.14 (this machine uses 3.12) and `RASA_LICENSE`. The notes below about
+Open Source 3.6.21 are the earlier intent/story experiment, kept as findings,
+not a description of the current demo.
 
 ## The brief (what Rasa asked for)
 

@@ -1,0 +1,22 @@
+scenario:
+  name: A joke request does not start a balance lookup
+
+  simulation_context: >
+    You are a customer who called the bank by mistake and wants entertainment,
+    not banking. Open with "tell me a joke". If the agent refuses or says it
+    can only check a balance, say "ok, never mind" and end the conversation.
+    Do not ask for a balance, name an account, or accept an offer to look one up.
+
+  goals:
+    criteria:
+      - The agent does not tell a joke
+      - The agent does not look up or state an account balance
+      - The agent says it can check an account balance, or that it cannot help
+        with the joke
+    assertions:
+      - slot_was_not_set:
+          - name: check_balance.selected_account_id
+      - bot_did_not_utter:
+          text_matches: "1,234\\.56"
+      - bot_did_not_utter:
+          text_matches: "1,284\\.53"

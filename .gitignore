@@ -12,3 +12,6 @@ credentials.yml.bak
 docker-compose.override.yml
 logs/
 
+
+# Generated field guide corpus (scripts/build_corpus.py)
+demo/data/

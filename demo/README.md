@@ -1,33 +1,51 @@
-# Demo: a Rasa agent, with the tests Rasa ships for agents
+# Demo: a Rasa agent that answers questions from the AI Engineering Field Guide
 
-Ada is a small bank assistant built with **Rasa Pro 3.20 (Mantle)**, the
-current release. She is an LLM agent: a skill description routes the
-conversation, and Python tools return the balance. This is not the older
-intent/story bot (Rasa Open Source 3.6).
+Rex is a career assistant for AI engineers, built with **Rasa Pro 3.20
+(Mantle)**. Ask him who is hiring, which skills employers ask for, what the
+interview process looks like, or how to prepare — he answers from
+[Alexey Grigorev's AI Engineering Field Guide](https://github.com/alexeygrigorev/ai-engineering-field-guide),
+never from his own training. The retrieval tool is
+[minsearch](https://github.com/alexeygrigorev/minsearch), the keyword-search
+library from the LLM course world: a small inverted index over
+`title`, `company`, and `text`, fitted in memory at first call.
 
 Python is 3.14, managed by uv (`uv sync` creates `.venv` from
-`.python-version`). The Open Source 3.6 line, which stopped at Python 3.11,
-is not used here.
+`.python-version`).
+
+## The corpus
+
+`scripts/build_corpus.py` reads the field guide repo and writes
+`data/field_guide_docs.json` (gitignored) — 1,274 documents, two kinds,
+split by a `section` keyword field:
+
+| section | documents | content |
+|---|---|---|
+| `guide` | 188 | the interview chapters, the question banks, research exports, the 51 per-company interview-process YAMLs, and awesome.md |
+| `job` | 1,086 | every raw posting in the newest job-market snapshot (2026-09-23 at the time of writing) |
+
+Job results are capped at two postings per company, so a who-is-hiring
+question surfaces several companies instead of five copies of one.
 
 ## What the tests check
 
-Scenarios live in `eval/scenarios/`. A simulator plays the customer. A judge
-scores the natural-language criteria. Assertions check the tracker and do not
-depend on the judge:
+Scenarios live in `eval/scenarios/`. A simulator plays the user. A judge
+scores the natural-language criteria. Assertions check the tracker and do
+not depend on the judge. Mantle records tool calls as `tool_executed`
+events, which assertions cannot target, so the search tool writes
+`answer_question.last_query` / `last_hit_count` into skill memory and the
+assertions watch those slots:
 
 | Scenario | What it locks down |
 |---|---|
-| `balance_named_up_front.yml` | "Rainy Day Savings" starts `check_balance`, `get_balance` writes the account label, and the reply contains €1,234.56 |
-| `joke_starts_nothing.yml` | "tell me a joke" does not select an account and does not speak either balance |
-
-That second case is the out-of-scope path. The agent rules say a joke must
-not start a skill and must not be answered as a joke.
+| `who_is_hiring.yml` | the search runs, and the answer names at least two real hiring companies |
+| `important_skills.yml` | the search runs, and the skills listed come from the guide, with no invented numbers |
+| `off_topic_joke.yml` | "tell me a joke" does not trigger a search — no `last_query` slot is ever written |
 
 ## Run
 
-Dependencies are `rasa-pro` 3.20.0, locked in `uv.lock`. `pyproject.toml`
-sets `exclude-newer` to 2026-09-25 so `uv sync` still sees that release
-when `~/.config/uv/uv.toml` says `exclude-newer = "7 days"`.
+Dependencies are `rasa-pro` 3.20.0 and `minsearch`, locked in `uv.lock`.
+`pyproject.toml` sets `exclude-newer` to 2026-09-25 so `uv sync` still sees
+that release when `~/.config/uv/uv.toml` says `exclude-newer = "7 days"`.
 
 The agent calls `gpt-4.1`. The test simulator and judge call `gpt-4o-mini`
 (`eval/conftest.yml`).
@@ -37,8 +55,11 @@ for the free Developer Edition). `.env` is gitignored. `rasa` loads it by
 walking up from `demo/`.
 
 ```bash
+git clone https://github.com/alexeygrigorev/ai-engineering-field-guide ../ai-engineering-field-guide
+
 cd demo
 uv sync
+uv run python scripts/build_corpus.py   # writes data/field_guide_docs.json
 uv run rasa train
 uv run rasa run --enable-api
 # another shell, still in demo/
@@ -49,51 +70,82 @@ Reports land in `eval/results/<timestamp>/`. A run passes only when every
 assertion and every criterion passes. Built-in quality scores (helpfulness,
 task completion) are recorded and do not decide pass or fail.
 
-`rasa inspect` opens a browser chat against the same model.
+`rasa inspect` opens a browser chat against the same model. If the server
+refuses to start with "address already in use", a previous `rasa run` is
+still holding port 5005.
 
-## Report: 2026-09-24 16:20
+## Report: 2026-09-24 17:23
 
 Python 3.14.3, Rasa Pro 3.20.0, agent model `gpt-4.1`, simulator and judge
 `gpt-4o-mini`. Command: `uv run python scripts/run_evals.py`. Source files:
-`eval/results/2026-09-24_16-20-53/`.
+`eval/results/2026-09-24_17-23-02/`.
 
 | Scenario | Result | Time |
 |---|---|---|
-| Customer names the savings account and gets its balance | 1/1 | 18.6s |
-| A joke request does not start a balance lookup | 1/1 | 10.0s |
-| **Total** | **2/2** | **28.6s** |
+| A hiring question reaches the job postings | 1/1 | 17.1s |
+| A skills question is answered from the guide | 1/1 | 15.3s |
+| A joke request does not trigger a search | 1/1 | 8.8s |
+| **Total** | **3/3** | **41.2s** |
 
-### Balance
+### Who is hiring
 
 ```
-User:  Could you tell me the balance of my Rainy Day Savings account?
-Agent: Your Rainy Day Savings account balance is €1,234.56.
-User:  Thanks, that's all I needed.
-Agent: Can I assist you with anything else?
+User:  Hi! I'm looking to find out which companies are currently hiring
+       AI engineers. Can you help with that?
+Agent: Several companies are currently hiring AI engineers:
+       - MARLOWE COMPANIES INC. (MCI) is hiring Senior Generative AI
+         Engineers and Generative AI Engineers, with remote positions
+         available in the USA.
+       - BRAHMA AI has AI Engineer positions in Bengaluru, India.
+       - Ergodic AI is recruiting AI Engineers for remote work, with a
+         presence in the USA.
+       - LawPro.ai is offering remote AI Engineer roles in the USA.
+       (Sources: Job listings in the AI Engineering Field Guide)
 ```
 
-Criteria: both passed (did not ask which account; stated the savings balance
-and the account name). Assertions: `flow_started(check_balance)`,
-`slot_was_set(check_balance.selected_account_id='acc_savings')`,
-`slot_was_set(check_balance.selected_account_label='Rainy Day Savings')`,
-`bot_uttered` matching `1,234.56`. Quality: bot 5.0/5, task completion pass.
-Average turn latency 3.8s.
+Criteria: both passed (at least two real companies; nothing invented).
+Assertions: `flow_started(answer_question)`,
+`slot_was_set(answer_question.last_query)`,
+`slot_was_set(answer_question.last_hit_count)`. Quality: bot 4.75/5, task
+completion pass. Average turn latency 2.4s.
+
+The first training of this run failed the two-company criterion: keyword
+search ranked five postings from MARLOWE COMPANIES INC. on top, so the agent
+named one company with five roles. The per-company cap in the tool fixed the
+ranking; the eval caught it, which is the point of the test.
+
+### Important skills
+
+```
+User:  What skills do employers typically look for in AI engineer roles?
+Agent: Employers typically look for AI engineers who can deploy reliable
+       APIs, build robust data pipelines, and work with agentic networks,
+       retrieval, and fine-tuning methods ("AI Engineering Role Analysis").
+       Hiring managers also value portfolio projects that demonstrate
+       practical skills and clear documentation ("Getting Hired — Portfolio
+       Strategy").
+```
+
+Criteria: both passed (concrete guide-grounded skills; no invented figures).
+Assertions: `slot_was_set(answer_question.last_query)`. Quality: bot 4.5/5,
+task completion pass. Average turn latency 2.7s.
 
 ### Joke
 
 ```
 User:  Tell me a joke.
-Agent: I can’t help with that here, but I’m happy to assist if you have a question about what I’m set up to do.
+Agent: I'm not able to help with that here, but if you have questions about
+       the topics I cover, I'd be glad to assist.
 User:  Ok, never mind.
-Agent: No problem! If you need to check an account balance, just let me know.
+Agent: No problem! If you have any questions about AI engineering jobs,
+       which skills matter, or what interviews are like, just let me know.
 ```
 
-Criteria: all three passed (no joke, no balance lookup, offered a balance
-check or refused the joke). Assertions: `selected_account_id` was not set,
-and neither €1,234.56 nor €1,284.53 was spoken. Quality: bot 2.75/5.
-Helpfulness 1/5 and task completion failed, because the judge scored the
-user's request for a joke, which this scenario requires the agent to refuse.
-Average turn latency 1.8s.
+Criteria: all three passed (no joke, no search, stayed in scope).
+Assertions: `answer_question.last_query` was never set. Quality: bot 2.0/5
+and task completion failed, because the judge scored the user's request for
+a joke, which this scenario requires the agent to refuse. Average turn
+latency 1.2s.
 
 ## License
 

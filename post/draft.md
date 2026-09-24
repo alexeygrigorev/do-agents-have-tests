@@ -1,4 +1,4 @@
-# LinkedIn post — draft 4 (voice, grounded)
+# LinkedIn post — draft 5 (voice, working)
 
 I analyzed nearly 7,000 AI engineering job descriptions. 60% require evaluation-related skills: LLM evaluation, guardrails, monitoring, observability.
 
@@ -20,7 +20,7 @@ That last part matters. "Tell me a joke" must never trigger a search — there's
 
 The first training run failed the tests. Asked "who is hiring?", the agent named one company — with five open roles: keyword search had ranked one employer's five postings on top. One-line fix later (cap results per company), everything is green.
 
-That's the difference between a demo and an agent you can ship. And voice is where it stops being negotiable: in chat, a wrong answer is a screenshot; on a call, it's a customer hearing your agent improvise. With Mantle, voice is a channel, not a rewrite — the same skill, the same tests, the same brain. The speech part is plug-in: Deepgram or Azure for the ears, Azure, Cartesia, Deepgram or Rime for the voice. No ElevenLabs yet — but the engine interface is two classes you write yourself, so it's an extension point, not a wall. Tests like these are how a voice experience earns the right to pick up the phone.
+That's the difference between a demo and an agent you can ship. And voice is where it stops being negotiable: in chat, a wrong answer is a screenshot; on a call, it's a customer hearing your agent improvise. With Mantle, voice is a channel, not a rewrite — the same skill, the same tests, the same brain. Rasa ships Deepgram and Azure for the ears, Cartesia and Rime for the voice — but not ElevenLabs. So I added it myself: two classes implementing Rasa's engine interfaces, and the same agent that passed the text tests now answers spoken questions in a real ElevenLabs voice. That is what an extension point is for. Tests like these are how a voice experience earns the right to pick up the phone.
 
 Do your agents have tests?
 

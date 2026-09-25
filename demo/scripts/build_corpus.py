@@ -164,7 +164,8 @@ def main() -> None:
     docs.extend(jobs)
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(docs, ensure_ascii=False), encoding="utf-8")
+    corpus_json = json.dumps(docs, ensure_ascii=False, indent=2)
+    OUTPUT.write_text(corpus_json, encoding="utf-8")
     print(
         f"{datetime.now().isoformat(timespec='seconds')} wrote {OUTPUT} "
         f"({len(docs)} docs: {len(docs) - len(jobs)} guide, {len(jobs)} jobs "

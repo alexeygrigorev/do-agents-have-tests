@@ -14,7 +14,6 @@ exist.
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 from minsearch import Index
@@ -32,31 +31,23 @@ _index: Index | None = None
 
 
 def _corpus_path() -> Path:
-    env = os.environ.get("FIELD_GUIDE_CORPUS")
-    candidates = (
-        [Path(env)]
-        if env
-        else [
-            Path.cwd() / "data" / "field_guide_docs.json",
-            Path(__file__).resolve().parents[2] / "data" / "field_guide_docs.json",
-        ]
-    )
-    for candidate in candidates:
-        if candidate.is_file():
-            return candidate
-    looked = ", ".join(str(c) for c in candidates)
-    raise FileNotFoundError(
-        f"field_guide_docs.json not found (looked in: {looked}). "
-        "Run `uv run python scripts/build_corpus.py` from demo/ first, or set FIELD_GUIDE_CORPUS."
-    )
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parents[2]
+    corpus_path = project_root / "data" / "field_guide_docs.json"
+    return corpus_path
 
 
 def _get_index() -> Index:
     global _index
     if _index is None:
-        index = Index(text_fields=["title", "company", "text"], keyword_fields=["section"])
-        index.fit(json.loads(_corpus_path().read_text(encoding="utf-8")))
-        _index = index
+        text_fields = ["title", "company", "text"]
+        keyword_fields = ["section"]
+        new_index = Index(text_fields=text_fields, keyword_fields=keyword_fields)
+        corpus_path = _corpus_path()
+        corpus_text = corpus_path.read_text(encoding="utf-8")
+        documents = json.loads(corpus_text)
+        new_index.fit(documents)
+        _index = new_index
     return _index
 
 
@@ -73,59 +64,87 @@ async def search_field_guide(
     query: str, section: str = "", context: ToolContext = None
 ) -> ToolResult:
     """Return the top corpus matches for query, optionally within one section."""
-    query = query.strip()
-    if not query:
-        return ToolResult(
-            llm_response={
-                "ok": False,
-                "error": "empty_query",
-                "hint": "Provide a short keyword query, e.g. 'RAG skills' or 'who is hiring'.",
-            }
-        )
+    stripped_query = query.strip()
+    if not stripped_query:
+        empty_query_response = {
+            "ok": False,
+            "error": "empty_query",
+            "hint": "Provide a short keyword query, e.g. 'RAG skills' or 'who is hiring'.",
+        }
+        return ToolResult(llm_response=empty_query_response)
 
-    section = section.strip()
-    filter_dict = {"section": section} if section else {}
-    hits = _get_index().search(
-        query, filter_dict=filter_dict, num_results=_NUM_RESULTS * _FETCH_FACTOR
+    stripped_section = section.strip()
+    filter_dict = {}
+    if stripped_section:
+        filter_dict["section"] = stripped_section
+
+    num_to_fetch = _NUM_RESULTS * _FETCH_FACTOR
+    search_index = _get_index()
+    raw_hits = search_index.search(
+        stripped_query, filter_dict=filter_dict, num_results=num_to_fetch
     )
 
-    kept: list[dict] = []
-    per_company: dict[str, int] = {}
-    for hit in hits:
-        key = hit.get("company") or hit["id"]
-        if per_company.get(key, 0) >= _MAX_PER_COMPANY:
-            continue
-        per_company[key] = per_company.get(key, 0) + 1
-        kept.append(hit)
-        if len(kept) == _NUM_RESULTS:
-            break
-    hits = kept
+    filtered_hits: list[dict] = []
+    hits_per_company: dict[str, int] = {}
+    for hit in raw_hits:
+        company_name = hit.get("company")
+        if company_name:
+            dedup_key = company_name
+        else:
+            dedup_key = hit["id"]
 
-    context.memory.set("last_query", query)
-    context.memory.set("last_hit_count", str(len(hits)))
+        current_count = hits_per_company.get(dedup_key, 0)
+        if current_count >= _MAX_PER_COMPANY:
+            continue
+
+        updated_count = current_count + 1
+        hits_per_company[dedup_key] = updated_count
+        filtered_hits.append(hit)
+
+        if len(filtered_hits) == _NUM_RESULTS:
+            break
+
+    context.memory.set("last_query", stripped_query)
+    hit_count_text = str(len(filtered_hits))
+    context.memory.set("last_hit_count", hit_count_text)
 
     results = []
-    for hit in hits:
-        entry = {
-            "section": hit["section"],
-            "title": hit["title"],
-            "text": hit["text"][:_SNIPPET_CHARS],
-        }
-        if hit["section"] == "job":
-            entry["company"] = hit.get("company", "")
-            entry["location"] = hit.get("location", "")
-            entry["remote"] = hit.get("remote", False)
+    for hit in filtered_hits:
+        section_name = hit["section"]
+        title = hit["title"]
+        full_text = hit["text"]
+        snippet = full_text[:_SNIPPET_CHARS]
+
+        entry = {}
+        entry["section"] = section_name
+        entry["title"] = title
+        entry["text"] = snippet
+
+        if section_name == "job":
+            company = hit.get("company", "")
+            location = hit.get("location", "")
+            is_remote = hit.get("remote", False)
+            entry["company"] = company
+            entry["location"] = location
+            entry["remote"] = is_remote
         else:
-            entry["source_file"] = hit.get("source_file", "")
+            source_file = hit.get("source_file", "")
+            entry["source_file"] = source_file
+
         results.append(entry)
 
     if not results:
-        return ToolResult(
-            llm_response={
-                "ok": False,
-                "query": query,
-                "results": [],
-                "hint": "No matches. Try different keywords or drop the section filter.",
-            }
-        )
-    return ToolResult(llm_response={"ok": True, "query": query, "results": results})
+        no_match_response = {
+            "ok": False,
+            "query": stripped_query,
+            "results": [],
+            "hint": "No matches. Try different keywords or drop the section filter.",
+        }
+        return ToolResult(llm_response=no_match_response)
+
+    success_response = {
+        "ok": True,
+        "query": stripped_query,
+        "results": results,
+    }
+    return ToolResult(llm_response=success_response)

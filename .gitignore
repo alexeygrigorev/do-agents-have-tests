@@ -11,6 +11,7 @@ credentials.yml.bak
 .lock
 docker-compose.override.yml
 logs/
+.tmp/
 
 
 # Generated field guide corpus (scripts/build_corpus.py)

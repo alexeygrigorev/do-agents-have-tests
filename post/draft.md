@@ -20,7 +20,7 @@ That last part matters. "Tell me a joke" must never trigger a search — there's
 
 The first training run failed the tests. Asked "who is hiring?", the agent named one company — with five open roles: keyword search had ranked one employer's five postings on top. One-line fix later (cap results per company), everything is green.
 
-That's the difference between a demo and an agent you can ship. And voice is where it stops being negotiable: in chat, a wrong answer is a screenshot; on a call, it's a customer hearing your agent improvise. With Mantle, voice is a channel, not a rewrite — the same skill, the same tests, the same brain. Rasa ships Deepgram and Azure for the ears, Cartesia and Rime for the voice — but not ElevenLabs. So I added it myself: two classes implementing Rasa's engine interfaces, and the same agent that passed the text tests now answers spoken questions in a real ElevenLabs voice. That is what an extension point is for. Tests like these are how a voice experience earns the right to pick up the phone.
+That's the difference between a demo and an agent you can ship. And voice is where it stops being negotiable: in chat, a wrong answer is a screenshot; on a call, it's a customer hearing your agent improvise. With Mantle, voice is a channel, not a rewrite — the same skill, the same tests, the same brain. The same agent that passed the text tests answers spoken questions through Deepgram. Tests like these are how a voice experience earns the right to pick up the phone.
 
 Do your agents have tests?
 

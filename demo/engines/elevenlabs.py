@@ -363,9 +363,8 @@ class ElevenLabsTTS(TTSEngine[ElevenLabsTTSConfig]):
         structlogger.debug("elevenlabs.tts.interrupted")
 
     async def stream_audio(self) -> AsyncIterator[RasaAudioBytes]:
-        if not self.ws or self.ws.closed:
-            raise TTSError("TTS websocket not connected.")
-        async for msg in self.ws:
+        ws = await self._ensure_connected()
+        async for msg in ws:
             if msg.type == WSMsgType.TEXT:
                 data = orjson.loads(msg.data)
                 if data.get("isFinal"):

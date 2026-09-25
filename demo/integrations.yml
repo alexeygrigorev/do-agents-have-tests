@@ -6,13 +6,13 @@ model_groups:
   - id: orchestrator
     models:
       - provider: openai
-        # GPT-6 Luna at its highest reasoning effort. This LiteLLM build does
-        # not know the model accepts reasoning_effort, so the param is allowlisted.
-        # Chat completions reject function tools unless effort is none; the
-        # server process must set LITELLM_ROUTE_ALL_CHAT_OPENAI_TO_RESPONSES=true
-        # before startup so tool calls go through the Responses API.
+        # This LiteLLM build does not know gpt-6-luna accepts reasoning_effort,
+        # so the param is allowlisted. Chat completions reject function tools
+        # unless effort is none; the server process must set
+        # LITELLM_ROUTE_ALL_CHAT_OPENAI_TO_RESPONSES=true before startup so
+        # tool calls go through the Responses API.
         model: gpt-6-luna
-        reasoning_effort: max
+        reasoning_effort: medium
         allowed_openai_params:
           - reasoning_effort
         api_key_env: OPENAI_API_KEY

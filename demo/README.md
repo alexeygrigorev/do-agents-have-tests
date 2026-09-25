@@ -65,8 +65,11 @@ Dependencies are `rasa-pro` 3.20.0 and `minsearch`, locked in `uv.lock`.
 `pyproject.toml` sets `exclude-newer` to 2026-09-25 so `uv sync` still sees
 that release when `~/.config/uv/uv.toml` says `exclude-newer = "7 days"`.
 
-The agent calls `gpt-4.1`. The test simulator and judge call `gpt-4o-mini`
-(`eval/conftest.yml`).
+The agent calls `gpt-6-luna` with reasoning effort `max`. The test
+simulator and judge call `gpt-4o-mini` (`eval/conftest.yml`). Tool calls
+need `LITELLM_ROUTE_ALL_CHAT_OPENAI_TO_RESPONSES=true` in the environment
+before `rasa` starts; Rasa reads `.env` too late for that LiteLLM flag, so
+it is also listed in the repo-root `.env` for launchers that export it first.
 
 Secrets stay in the repo-root `.env` (`OPENAI_API_KEY`, and `RASA_LICENSE`
 for the free Developer Edition). `.env` is gitignored. `rasa` loads it by

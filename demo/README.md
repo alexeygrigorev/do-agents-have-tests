@@ -1,10 +1,13 @@
 # Demo: a Rasa agent that answers questions from the AI Engineering Field Guide
 
-Rex is a career assistant for AI engineers, built with **Rasa Pro 3.20
-(Mantle)**. Ask him who is hiring, which skills employers ask for, what the
-interview process looks like, or how to prepare — he answers from
-[Alexey Grigorev's AI Engineering Field Guide](https://github.com/alexeygrigorev/ai-engineering-field-guide),
-never from his own training. The retrieval tool is
+Rex is a career assistant for AI engineers, built with Rasa Pro 3.20
+(Mantle).
+
+Ask it who is hiring, which skills employers ask for, what the
+interview process looks like, or how to prepare. It answers from
+[Alexey Grigorev's AI Engineering Field Guide](https://github.com/alexeygrigorev/ai-engineering-field-guide).
+
+The retrieval tool is
 [minsearch](https://github.com/alexeygrigorev/minsearch), the keyword-search
 library from the LLM course world: a small inverted index over
 `title`, `company`, and `text`, fitted in memory at first call.
@@ -26,7 +29,7 @@ split by a `section` keyword field:
 Job results are capped at two postings per company, so a who-is-hiring
 question surfaces several companies instead of five copies of one.
 
-## What the tests check
+## Tests
 
 Scenarios live in `eval/scenarios/`. A simulator plays the user. A judge
 scores the natural-language criteria. Assertions check the tracker and do
@@ -43,12 +46,7 @@ assertions watch those slots:
 
 ## Voice
 
-Rex talks. Mantle ships no speech models of its own: a voice channel streams
-audio, and speech integrations provide the ears and the mouth. Built-in
-integrations are Deepgram and Azure (ASR) and Azure, Cartesia, Deepgram and
-Rime (TTS) — **ElevenLabs is not on the list**, so this demo implements it:
-two classes in `engines/elevenlabs.py` subclassing Rasa's `ASREngine` and
-`TTSEngine`:
+Rex talks using ElevenLabs. The implementation is in `engines/elevenlabs.py` subclassing Rasa's `ASREngine` and `TTSEngine`:
 
 - `ElevenLabsASR` streams to Scribe v2 Realtime
   (`wss://api.elevenlabs.io/v1/speech-to-text/realtime`, VAD auto-commit);

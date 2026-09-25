@@ -46,34 +46,14 @@ assertions watch those slots:
 
 ## Voice
 
-Rex talks using ElevenLabs. The implementation is in `engines/elevenlabs.py` subclassing Rasa's `ASREngine` and `TTSEngine`:
-
-- `ElevenLabsASR` streams to Scribe v2 Realtime
-  (`wss://api.elevenlabs.io/v1/speech-to-text/realtime`, VAD auto-commit);
-  partial transcripts drive barge-in, committed ones become user messages.
-- `ElevenLabsTTS` streams via the text-to-speech stream-input websocket,
-  reusing one connection across replies.
-
-They are wired in `integrations.yml` (`channels:` → `inspector:` and
-`browser_audio:`, both with `name: engines.elevenlabs.ElevenLabsASR` /
-`ElevenLabsTTS`) — in Mantle projects channels come from
+Rex talks using Deepgram, Rasa's built-in speech engines: Nova-3 for
+speech-to-text and Aura-2 Thalia for text-to-speech. They are wired in
+`integrations.yml` (`channels:` → `inspector:` and `browser_audio:`, both
+with `name: deepgram`). In Mantle projects channels come from
 `integrations.yml`; `credentials.yml` is only read by CALM v1 layouts.
-`ELEVENLABS_API_KEY` lives in the repo-root `.env`. With that in place, the
+`DEEPGRAM_API_KEY` lives in the repo-root `.env`. With that in place, the
 mic button in `rasa inspect` turns the browser into a phone call.
 
-Verified end to end on 2026-09-24: a scripted websocket client spoke "Who is
-hiring for AI engineers right now?" into `browser_audio`; Scribe transcribed
-it, Rex searched the corpus and answered with real companies, and the reply
-came back as ElevenLabs audio (~108 KB). The engine-level roundtrip test
-(TTS → PCM → ASR, no server needed) lives in
-`scripts/test_elevenlabs_engines.py`:
-
-```bash
-uv run python scripts/test_elevenlabs_engines.py
-```
-
-To use a built-in engine instead, change `name:` under `asr:` / `tts:` in
-`integrations.yml` (e.g. `deepgram`) and add its API key to `.env`.
 Telephony channels (Twilio Media Streams, AudioCodes, Genesys Cloud,
 Jambonz, SignalWire, Vonage) reuse the same engine config. Voice needs a
 license with the `rasa:voice` scope; the Developer Edition key in this

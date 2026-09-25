@@ -8,7 +8,9 @@ I built a simple voice agent that can help me navigate the AI Engineering job ma
 
 It can be further improved, but it gives me a great starting point.
 
-CTA?
+Give your coding agent a real business problem, point it at your data, and let it build the first version with Rasa.
+
+Link:
 
 Thank you to Rasa for collaborating on this post and supporting our community!
 
